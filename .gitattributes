@@ -1,0 +1,1 @@
+oc-p9-azure-function-contentbased-precalculation-all-in-one/embeddings_matrix/articles_embeddings.pkl filter=lfs diff=lfs merge=lfs -text
