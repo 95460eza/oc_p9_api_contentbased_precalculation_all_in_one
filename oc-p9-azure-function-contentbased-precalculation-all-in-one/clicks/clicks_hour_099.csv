@@ -1,0 +1,3 @@
+user_id,session_id,session_start,session_size,click_article_id,click_timestamp,click_environment,click_deviceGroup,click_os,click_country,click_region,click_referrer_type
+3378,1507183355268309,1507183355000,2,220345,1507213178772,4,1,17,1,16,1
+3378,1507183355268309,1507183355000,2,123909,1507213208772,4,1,17,1,16,1

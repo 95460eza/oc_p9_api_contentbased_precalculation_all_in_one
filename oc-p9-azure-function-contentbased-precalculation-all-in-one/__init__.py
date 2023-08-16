@@ -40,6 +40,10 @@ def predict_top_items():
     data_as_dict = flask.request.get_json()
     uid = int(data_as_dict["id"])
 
+    # On take a subset of the embeddings matrix
+    subset_of_articles_size = 1000
+    
+
     # Read-In Users Interactions Log files
     def read_in_user_intersactions(files_path):
 
@@ -63,7 +67,7 @@ def predict_top_items():
     
         
 
-    users_interactions_folder = os.path.join(os.getcwd(), "oc-p9-api-contentbased-precalculation-all-in-one/clicks")
+    users_interactions_folder = os.path.join(os.getcwd(), "oc-p9-azure-function-contentbased-precalculation-all-in-one/clicks")
     df_users_interactions = read_in_user_intersactions(users_interactions_folder)
 
 
@@ -80,8 +84,8 @@ def predict_top_items():
 
     df_all_users_last_clicked_article = find_all_users_last_article_clicked(df_users_interactions) 
     # This step ONLY for All-in-on API: Otherwise store the table above in a Database and query it for user last article cliked
-    #user_last_article_clicked = int(df_all_users_last_clicked_article[df_all_users_last_clicked_article["user_id"] == uid]["last_click_article_id"][uid])
-    user_last_article_clicked = 14
+    user_last_article_clicked = int(df_all_users_last_clicked_article[df_all_users_last_clicked_article["user_id"] == uid]["last_click_article_id"][uid])
+    #user_last_article_clicked = 14
     del(df_users_interactions)
 
 
@@ -89,22 +93,20 @@ def predict_top_items():
     # Articles Embeddings Info
     def get_articles_embeddings_info():
          
-        embeddings_folder = os.path.join(os.getcwd(), "oc-p9-api-contentbased-precalculation-all-in-one/embeddings_matrix")
+        embeddings_folder = os.path.join(os.getcwd(), "oc-p9-azure-function-contentbased-precalculation-all-in-one/embeddings_matrix")
         # Read embeddings matrix
         with open(os.path.join(embeddings_folder, "articles_embeddings.pkl"), "rb") as file:
             array_loaded = pickle.load(file)
         # df_no_ids = pd.DataFrame(array_loaded)
 
         # Articles metadata
-        article_metada_folder = os.path.join(os.getcwd(), "oc-p9-api-contentbased-precalculation-all-in-one/articles_info")
+        article_metada_folder = os.path.join(os.getcwd(), "oc-p9-azure-function-contentbased-precalculation-all-in-one/articles_info")
         df_metadata = pd.read_csv(os.path.join(article_metada_folder, "articles_metadata.csv") )
         df_ids = df_metadata[["article_id"]]
 
         return array_loaded, df_ids
 
-    embeddings_matrix, df_article_ids = get_articles_embeddings_info()
-    #subset_of_articles_size = 1000
-    subset_of_articles_size = 20
+    embeddings_matrix, df_article_ids = get_articles_embeddings_info()    
     embeddings_matrix = embeddings_matrix[:subset_of_articles_size]
     df_article_ids = df_article_ids.head(subset_of_articles_size)
 
@@ -169,3 +171,9 @@ def predict_top_items():
     json_string = top_n_values.to_json()
 
     return flask.jsonify(response=json_string, message=user_last_article_clicked)
+
+
+# Run app Locally and ='0.0.0.0' in case of Docker container
+#if __name__ == '__main__':
+    #app.run(host='0.0.0.0', port=5000, debug=True)
+    #app.run(host='0.0.0.0', port=8000, debug=True)
